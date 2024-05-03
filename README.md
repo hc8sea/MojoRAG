@@ -11,11 +11,15 @@ Ask something about Mojo, and the chatbot will provide an answer, citing the sou
 
 ## Usage
 
-Clone the repo:
+General setup:
 
 ```bash
 git clone https://github.com/hc8sea/MojoRAG
 cd MojoRAG
+
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 ```
 
 Setup the vector store:
@@ -24,11 +28,8 @@ Setup the vector store:
 python3 source/data_ingestor.py --data-path '../data/mojo/docs/*.md'
 ```
 
-Setup the server:
+Fire up the server:
 ```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
 
 uvicorn source.main:app --reload
 ```
