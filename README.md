@@ -1,4 +1,4 @@
-![Python 3.10](https://img.shields.io/badge/python-3.9-blue.svg)
+![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)
 
 # Mojo Documentation Assistant
 
@@ -11,6 +11,13 @@ Ask something about Mojo, and the chatbot will provide an answer, citing the sou
 
 ## Usage
 
+Clone the repo:
+
+```bash
+git clone https://github.com/hc8sea/MojoRAG
+cd MojoRAG
+```
+
 Setup the vector store:
 
 ```bash
@@ -19,9 +26,6 @@ python3 source/data_ingestor.py --data-path '../data/mojo/docs/*.md'
 
 Setup the server:
 ```bash
-git clone https://github.com/hc8sea/MojoRAG
-cd MojoRAG
-
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
