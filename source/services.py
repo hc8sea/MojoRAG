@@ -48,7 +48,7 @@ def fetch_data(query: Message, chroma_client):
 
 def process_metadata(metadata):
     """Process metadata to extract and format necessary information."""
-    base_url = os.environ['BASE_URL']
+    base_url = 'http://path.to.files/'
     processed_metadata = [(data['filename'], process_title(data['title']))
                           for data in metadata if data]
     markdown_links = [f"[{title}]({base_url + filename})" for filename, title in processed_metadata]
