@@ -64,7 +64,8 @@ def calculate_scores(query, documents, cross_encoder):
 
 def filter_and_sort_scores(scores):
     """Filter and sort the scores, returning sorted indices of the documents."""
-    filtered_scores = [score for score in scores if score > 0]
+    # filtered_scores = [score for score in scores if score > 0]
+    filtered_scores = scores
     sorted_indices = np.argsort(-np.array(filtered_scores))
     return sorted_indices
 
