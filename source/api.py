@@ -10,6 +10,8 @@ from sentence_transformers import CrossEncoder
 from models import Message
 from services import get_answer
 from evaluation import evaluate_rag
+import os
+print(os.environ.get('PYTHONPATH'))
 
 logging.basicConfig(level=logging.ERROR, filename='api_errors.log', filemode='a',
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')

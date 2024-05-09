@@ -3,7 +3,7 @@
 Script for ingesting markdown files into a ChromaDB database.
 This script reads markdown files, splits them into chunks, and ingests them into a specified ChromaDB collection.
 Usage:
-    python3 source/data_ingestor.py --data-path '../data/mojo/docs/*.md'
+    python3 data_ingestor.py --data-path '../data/mojo/docs/*.md'
 """
 
 import config
@@ -19,18 +19,16 @@ from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunct
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-def read_file_content(file_path):
-    """Reads content from a markdown file and returns the title and the entire content."""
+def parse_arguments():
+    """Parses command-line arguments."""
     try:
-        with open(file_path, 'r', encoding='utf-8') as file:
-            file_lines = file.readlines()
-        title = file_lines[0].strip()
-        content = "".join(file_lines)
-        return title, content
+        parser = argparse.ArgumentParser(description="Ingest markdown documentation into ChromaDB.")
+        parser.add_argument("--data-path", type=str, required=True, help="Glob path to markdown files for ingestion.")
+        return parser.parse_args()
     except Exception as e:
-        logging.error(f"Failed to read {file_path}: {e}")
-        return None, None
-
+        logging.error(f"Error parsing arguments: {e}")
+        raise
+    
 
 def split_text(content, markdown_splitter, token_splitter):
     """Splits content into chunks based on markdown headers and then into smaller chunks."""
@@ -45,34 +43,6 @@ def split_text(content, markdown_splitter, token_splitter):
         return []
 
 
-def prepare_metadata(token_split_texts, base_filename, title):
-    """Prepares metadata for the chunks."""
-    try:
-        return [{"filename": base_filename, "title": title} for _ in token_split_texts]
-    except Exception as e:
-        logging.error(f"Error preparing metadata: {e}")
-        return []
-
-
-def ingest_chunks(ids, documents, metadatas, collection):
-    """Adds chunks to the ChromaDB collection."""
-    try:
-        collection.add(ids=ids, documents=documents, metadatas=metadatas)
-    except Exception as e:
-        logging.error(f"Failed to ingest chunks into the collection: {e}")
-
-
-def parse_arguments():
-    """Parses command-line arguments."""
-    import argparse
-    try:
-        parser = argparse.ArgumentParser(description="Ingest markdown documentation into ChromaDB.")
-        parser.add_argument("--data-path", type=str, required=True, help="Glob path to markdown files for ingestion.")
-        return parser.parse_args()
-    except Exception as e:
-        logging.error(f"Error parsing arguments: {e}")
-        raise
-
 def setup_markdown_splitter():
     """Sets up the Markdown header splitter with specific headers."""
     try:
@@ -86,6 +56,7 @@ def setup_markdown_splitter():
         logging.error(f"Error setting up Markdown splitter: {e}")
         raise
 
+
 def setup_token_splitter():
     """Sets up the token text splitter with specified chunk parameters."""
     try:
@@ -93,6 +64,7 @@ def setup_token_splitter():
     except Exception as e:
         logging.error(f"Error setting up token splitter: {e}")
         raise
+
 
 def setup_chromadb():
     """Sets up the ChromaDB client and collection."""
@@ -103,6 +75,37 @@ def setup_chromadb():
     except Exception as e:
         logging.error(f"Error setting up ChromaDB collection: {e}")
         raise
+
+
+def read_file_content(file_path):
+    """Reads content from a markdown file and returns the title and the entire content."""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            file_lines = file.readlines()
+        title = file_lines[0].strip()
+        content = "".join(file_lines)
+        return title, content
+    except Exception as e:
+        logging.error(f"Failed to read {file_path}: {e}")
+        return None, None
+
+
+def prepare_metadata(token_split_texts, base_filename, title):
+    """Prepares metadata for the chunks."""
+    try:
+        return [{"filename": base_filename, "title": title} for _ in token_split_texts]
+    except Exception as e:
+        logging.error(f"Error preparing metadata: {e}")
+        return []
+    
+
+def ingest_chunks(ids, documents, metadatas, collection):
+    """Adds chunks to the ChromaDB collection."""
+    try:
+        collection.add(ids=ids, documents=documents, metadatas=metadatas)
+    except Exception as e:
+        logging.error(f"Failed to ingest chunks into the collection: {e}")
+
 
 def process_file(file_path, markdown_splitter, token_splitter, collection, total_chunks_added):
     """Processes a single file and ingests its chunks into the ChromaDB collection."""
@@ -121,16 +124,17 @@ def process_file(file_path, markdown_splitter, token_splitter, collection, total
         logging.error(f"Error processing file {file_path}: {e}")
         return total_chunks_added
 
+
 def main():
     """Main function orchestrating the ingestion of markdown files into ChromaDB."""
     try:
         args = parse_arguments()
-        file_path_list = glob.glob(args.data_path)
 
         markdown_splitter = setup_markdown_splitter()
         token_splitter = setup_token_splitter()
         chroma_collection = setup_chromadb()
 
+        file_path_list = glob.glob(args.data_path)
         total_chunks_added = 0
         for file_path in tqdm(file_path_list):
             total_chunks_added = process_file(file_path, markdown_splitter, token_splitter, chroma_collection, total_chunks_added)
