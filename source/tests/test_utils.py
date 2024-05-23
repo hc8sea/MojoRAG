@@ -1,8 +1,10 @@
 import pytest
 import logging
-from utils import word_wrap, process_title
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from ..utils import word_wrap, process_title
 
-# Set up logging to display warnings during test execution
 logging.basicConfig(level=logging.WARNING)
 
 @pytest.mark.parametrize(
